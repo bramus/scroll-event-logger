@@ -1,0 +1,5 @@
+{
+  "name": "Scroll Event Logger",
+  "description": "A tool to visualize scroll and scrollend events with real-time scroll position monitoring.",
+  "requestFramePermissions": []
+}
