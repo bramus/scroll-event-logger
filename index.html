@@ -3,11 +3,110 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>Scroll Event Logger</title>
+    <link rel="stylesheet" href="/src/index.css">
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="h-screen bg-neutral-50 flex flex-col overflow-hidden font-sans text-neutral-900">
+      <!-- Header -->
+      <header class="shrink-0 p-4 md:p-6 pb-0 flex flex-col gap-2">
+        <h1 class="text-2xl font-bold tracking-tight text-neutral-900">Scroll Event Logger</h1>
+        <p class="text-neutral-500">
+          Scroll the pane on the left to see events and coordinates update in real-time.
+        </p>
+      </header>
+
+      <main class="flex-1 min-h-0 p-4 md:p-6 grid grid-cols-1 grid-rows-2 lg:grid-cols-2 lg:grid-rows-1 gap-4 md:gap-6">
+        <!-- Left Pane -->
+        <section class="flex flex-col gap-3 min-h-0 h-full">
+          <div class="shrink-0 flex items-center justify-between">
+            <h2 class="font-semibold text-neutral-700 flex items-center gap-2">
+              <!-- Activity Icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+              Scrollable Region
+            </h2>
+            <span class="text-xs text-neutral-400 font-mono">overflow: auto</span>
+          </div>
+          
+          <div id="scroller" class="flex-1 border border-neutral-200 rounded-xl bg-white shadow-sm overflow-auto relative">
+            <div class="w-[200%] h-[200%] bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]" style="min-width: 800px; min-height: 800px;">
+              <div class="p-8 grid gap-8">
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg inline-block">Top Left Content</div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-purple-50 border border-purple-100 p-4 rounded-lg">Center Content</div>
+                <div class="absolute bottom-8 right-8 bg-emerald-50 border border-emerald-100 p-4 rounded-lg">Bottom Right Content</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Pane -->
+        <section class="flex flex-col gap-4 min-h-0 h-full">
+          <!-- Log -->
+          <div class="flex-1 flex flex-col gap-3 min-h-0">
+            <div class="shrink-0 flex items-center justify-between">
+              <h2 class="font-semibold text-neutral-700">Event Log</h2>
+              <button id="clear-btn" class="text-xs flex items-center gap-1 text-neutral-500 hover:text-red-600 transition-colors px-2 py-1 rounded hover:bg-neutral-100 cursor-pointer">
+                <!-- Trash2 Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                Clear
+              </button>
+            </div>
+            
+            <div class="flex-1 border border-neutral-200 rounded-xl bg-white shadow-sm overflow-hidden flex flex-col">
+              <div id="log-container" class="flex-1 overflow-y-auto p-4 space-y-2 font-mono text-sm">
+                <div id="empty-state" class="h-full flex items-center justify-center text-neutral-400 italic">
+                  No events yet. Start scrolling!
+                </div>
+                <!-- Logs will go here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrics -->
+          <div class="shrink-0 flex flex-col gap-3">
+            <h2 class="font-semibold text-neutral-700">Live Metrics</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <!-- Scroll Left -->
+              <div class="bg-white p-3 md:p-4 rounded-xl border border-neutral-200 shadow-sm flex flex-col gap-1">
+                <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  Scroll Left
+                </span>
+                <span id="metric-left" class="text-xl md:text-2xl font-mono font-semibold text-neutral-900">0px</span>
+              </div>
+              
+              <!-- Scroll Right -->
+              <div class="bg-white p-3 md:p-4 rounded-xl border border-neutral-200 shadow-sm flex flex-col gap-1">
+                <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 rotate-180"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  Scroll Right
+                </span>
+                <span id="metric-right" class="text-xl md:text-2xl font-mono font-semibold text-neutral-900">0px</span>
+              </div>
+
+              <!-- Scroll Top -->
+              <div class="bg-white p-3 md:p-4 rounded-xl border border-neutral-200 shadow-sm flex flex-col gap-1">
+                <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                  Scroll Top
+                </span>
+                <span id="metric-top" class="text-xl md:text-2xl font-mono font-semibold text-neutral-900">0px</span>
+              </div>
+
+              <!-- Scroll Bottom -->
+              <div class="bg-white p-3 md:p-4 rounded-xl border border-neutral-200 shadow-sm flex flex-col gap-1">
+                <span class="text-xs font-medium text-neutral-500 uppercase tracking-wider flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 rotate-180"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                  Scroll Bottom
+                </span>
+                <span id="metric-bottom" class="text-xl md:text-2xl font-mono font-semibold text-neutral-900">0px</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
 
