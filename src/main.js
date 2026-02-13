@@ -38,14 +38,14 @@ function renderLog(log) {
   }
 
   const row = document.createElement('div');
-  row.className = 'flex items-start gap-3 animate-in fade-in slide-in-from-left-2 duration-200';
+  row.className = 'log-entry';
   
   const time = document.createElement('span');
-  time.className = 'text-neutral-400 shrink-0 select-none';
+  time.className = 'log-time';
   time.textContent = log.timestamp;
   
   const type = document.createElement('span');
-  type.className = `font-medium ${log.type === 'scrollend' ? 'text-indigo-600' : 'text-amber-600'}`;
+  type.className = `log-type ${log.type}`;
   type.textContent = log.type;
   
   row.appendChild(time);
