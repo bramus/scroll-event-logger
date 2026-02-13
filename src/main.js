@@ -1,18 +1,18 @@
 import './index.css';
 
-const scroller = document.getElementById('scroller') as HTMLDivElement;
-const logContainer = document.getElementById('log-container') as HTMLDivElement;
-const emptyState = document.getElementById('empty-state') as HTMLDivElement;
-const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+const scroller = document.getElementById('scroller');
+const logContainer = document.getElementById('log-container');
+const emptyState = document.getElementById('empty-state');
+const clearBtn = document.getElementById('clear-btn');
 
-const metricLeft = document.getElementById('metric-left') as HTMLSpanElement;
-const metricRight = document.getElementById('metric-right') as HTMLSpanElement;
-const metricTop = document.getElementById('metric-top') as HTMLSpanElement;
-const metricBottom = document.getElementById('metric-bottom') as HTMLSpanElement;
+const metricLeft = document.getElementById('metric-left');
+const metricRight = document.getElementById('metric-right');
+const metricTop = document.getElementById('metric-top');
+const metricBottom = document.getElementById('metric-bottom');
 
-let logs: { id: string; type: string; timestamp: string }[] = [];
+let logs = [];
 
-function formatTime(date: Date) {
+function formatTime(date) {
   return date.toLocaleTimeString('en-US', {
     hour12: false,
     hour: '2-digit',
@@ -32,7 +32,7 @@ function updateMetrics() {
   metricBottom.textContent = `${Math.round(scrollHeight - clientHeight - scrollTop)}px`;
 }
 
-function renderLog(log: { id: string; type: string; timestamp: string }) {
+function renderLog(log) {
   if (emptyState && emptyState.style.display !== 'none') {
     emptyState.style.display = 'none';
   }
@@ -57,7 +57,7 @@ function renderLog(log: { id: string; type: string; timestamp: string }) {
   row.scrollIntoView({ behavior: 'smooth' });
 }
 
-function addLog(type: 'scroll' | 'scrollend') {
+function addLog(type) {
   const newLog = {
     id: crypto.randomUUID(),
     type,
@@ -67,10 +67,6 @@ function addLog(type: 'scroll' | 'scrollend') {
   logs.push(newLog);
   if (logs.length > 50) {
     logs.shift();
-    // Remove first child that isn't empty-state (if empty state is hidden)
-    // Actually simpler to just remove the second child if empty state is first
-    // Or just re-render. But appending is more performant.
-    // Let's just remove the first log element.
     const firstLog = logContainer.querySelector('div:not(#empty-state)');
     if (firstLog) firstLog.remove();
   }
@@ -80,7 +76,6 @@ function addLog(type: 'scroll' | 'scrollend') {
 
 function clearLogs() {
   logs = [];
-  // Remove all divs except empty-state
   const rows = logContainer.querySelectorAll('div:not(#empty-state)');
   rows.forEach(row => row.remove());
   if (emptyState) emptyState.style.display = 'flex';
